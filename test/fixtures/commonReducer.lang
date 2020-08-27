@@ -1,0 +1,11 @@
+{
+  "placeholderText0": "Søk på tags og kommentarer",
+  "placeholderText2": "Søk på tags og kommentarer",
+  "placeholderText4": "Søk på innhold i kvitteringer",
+  "placeholderText6": "Søk på brukersted",
+  "placeholderText8": "👈 Filtrer på land, tidsrom m.m",
+  "merchanttip": "Skriv f. eks. ${key:string}: '${val:number}'",
+  "merchanttipEmpty": "skriv et søkeord eller velg et filter",
+  "attachmentFriendlyName": "vedlegg",
+  "fetchCardUsageError": "Klarte ikke hente bruksstatus"
+}

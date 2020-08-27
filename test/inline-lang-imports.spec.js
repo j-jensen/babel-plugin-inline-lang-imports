@@ -1,37 +1,77 @@
-import tmp from 'tmp';
 import path from 'path';
-const x = "xx";
-import { expect } from 'chai';
+import assert from "assert";
 import { transform, transformFileSync } from 'babel-core';
-
-tmp.setGracefulCleanup();
+import * as t from "babel-types";
 
 describe('babel-plugin-inline-lang-imports', () => {
   it('inlines simple LANG imports', () => {
-    const t = configureTransform()
-    const result = t(`
-      import ress from '../test/fixtures/AccountPage.lang'
+    const execTransform = configureTransform()
+    const result = execTransform(`
+      import ress from '../test/fixtures/AccountPage.lang';
     `);
 
-    expect(result.ast.program.body[0].type).to.equal("VariableDeclaration");
-    expect(result.ast.program.body[0].declarations[0].id.name).to.equal("ress");
+    const { ast: { program: { body: [{ declarations: [{ id, init }] }] } } } = result;
 
-    expect(result.ast.program.body[0].declarations[0].init.type).to.equal("ObjectExpression");
-    expect(result.ast.program.body[0].declarations[0].init.properties[0].key.name).to.equal("title");
-    expect(result.ast.program.body[0].declarations[0].init.properties[1].value.value).to.equal("Avtaledokumenter");
+    assert.ok(t.isObjectExpression(init));
+    assert.ok(t.isIdentifier(id, { name: "ress" }));
+
+    const { properties: langProps } = init;
+
+    assert.ok(langProps.every(p => t.isObjectProperty(p)));
+
+    const [{ key: { name } }, { value: { value } }] = langProps;
+
+    assert.equal(name, "title");
+    assert.equal(value, "Avtaledokumenter");
+  });
+
+  it('supports aliased-destructuring of the LANG imports', () => {
+    const execTransform = configureTransform()
+    const result = execTransform(`
+        import {linkBtnLabelBraVaenner as brvTxt} from '../test/fixtures/AccountPage.lang';
+        console.log(brvTxt);
+      `);
+
+    const { ast: { program: { body: [{ declarations: [declaration] }] } } } = result;
+
+    assert.ok(t.isVariableDeclarator(declaration));
+
+    const { id: { properties: [obj] } } = declaration;
+    assert.ok(t.isObjectProperty(obj));
+    assert.equal(obj.shorthand, false, "Aliased destruction, can not be shorthand");
   });
 
   it('supports destructuring of the LANG imports', () => {
-    const t = configureTransform()
-    const result = t(`
-      import {linkBtnLabelBraVaenner as brvTxt} from '../test/fixtures/AccountPage.lang';
-      console.log(brvTxt);
+    const execTransform = configureTransform()
+    const result = execTransform(`
+      import {linkBtnLabelBraVaenner} from '../test/fixtures/AccountPage.lang';
+      console.log(linkBtnLabelBraVaenner);
     `);
 
-    // How th f... do we veryfy that?
-    expect(result.ast.program.body[0].declarations[0].type).to.equal("VariableDeclarator");
+    const { ast: { program: { body: [{ declarations: [declaration] }] } } } = result;
+
+    assert.ok(t.isVariableDeclarator(declaration));
+
+    const { id: { properties: [obj] } } = declaration;
+    assert.ok(t.isObjectProperty(obj));
+    assert.ok(obj.shorthand);
   });
 
+  it('Supports template props', () => {
+    const execTransform = configureTransform()
+    let res = null;
+    const result = execTransform(`
+      import {merchanttip} from '../test/fixtures/commonReducer.lang';
+      res = merchanttip('Hello world', 2020);
+    `);
+    const { ast: { program: { body: [{ declarations: [declaration] }] } } } = result;
+
+    // TODO: Unittest to verify this
+    eval(result.code);
+    assert.ok(res);
+
+    //console.log("Test", declaration.init.properties);
+  })
 });
 
 function configureTransform(options = {}, isFile) {
