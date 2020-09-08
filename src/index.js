@@ -1,8 +1,7 @@
 import Path from 'path'
 import fs from "fs";
+import { templateRe } from "lang-core";
 
-const templateRe = /\$\{(\w+):?(\w+)?\}/g;
-const typedescRe = /(\${\w+)(:\w+)(})/g;
 
 
 const SUPPORTED_MODULES_REGEX = /\.lang$/
@@ -45,7 +44,7 @@ export default function babelPluginInlineLangImports({ types: t }) {
                     expressions
                   )
                 );
-  
+
                 return Object.assign(prop, {
                   value: afe
                 });

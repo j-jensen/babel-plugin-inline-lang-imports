@@ -1,9 +1,10 @@
 {
   "name": "babel-plugin-inline-lang-imports",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Inlines LANG-file imports straight into JS code",
   "main": "build/index.js",
   "dependencies": {
+    "lang-core": "^1.0.8"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

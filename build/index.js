@@ -1,22 +1,21 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = babelPluginInlineLangImports;
 
-var _path = require('path');
+var _path = require("path");
 
 var _path2 = _interopRequireDefault(_path);
 
-var _fs = require('fs');
+var _fs = require("fs");
 
 var _fs2 = _interopRequireDefault(_fs);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _langCore = require("lang-core");
 
-var templateRe = /\$\{(\w+):?(\w+)?\}/g;
-var typedescRe = /(\${\w+)(:\w+)(})/g;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var SUPPORTED_MODULES_REGEX = /\.lang$/;
 
@@ -44,7 +43,7 @@ function babelPluginInlineLangImports(_ref) {
 
               var quasis = [];
               var expressions = [];
-              var m = templateRe.exec(value);
+              var m = _langCore.templateRe.exec(value);
               var idx = 0;
               if (m !== null) {
                 while (m !== null) {
@@ -52,7 +51,7 @@ function babelPluginInlineLangImports(_ref) {
                   quasis.push(t.templateElement({ raw: value.slice(idx, m.index) }, false));
                   idx = m.index + m[0].length;
                   expressions.push(t.identifier(m[1]));
-                  m = templateRe.exec(value);
+                  m = _langCore.templateRe.exec(value);
                 }
                 quasis.push(t.templateElement({ raw: value.slice(idx) }, true));
 
